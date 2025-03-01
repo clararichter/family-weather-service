@@ -1,3 +1,4 @@
 main
+.env
 project-notes.md
 rest-client-internal.http
