@@ -2,6 +2,7 @@ package app
 
 import (
 	"net/http"
+	"time"
 	"weather-aggregation-service/internal/services"
 
 	"github.com/gorilla/mux"
@@ -27,7 +28,7 @@ func (a *APIServer) Run() error {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.
-		HandleFunc("/weather-summary", a.handlerWeatherSummary).
+		HandleFunc("/weather-summary", withLogging(a.logger, a.handlerWeatherSummary)).
 		Methods("GET").
 		Name("GetWeatherSummary")
 
@@ -38,6 +39,21 @@ func (a *APIServer) Run() error {
 	return http.ListenAndServe(a.port, router)
 }
 
-func (a *APIServer) handlerWeatherSummary(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
+func withLogging(logger *logrus.Logger, next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		logger.WithFields(logrus.Fields{
+			"method": r.Method,
+			"path":   r.URL.Path,
+		}).Info("Endpoint hit")
+
+		next(w, r)
+
+		logger.WithFields(logrus.Fields{
+			"method":   r.Method,
+			"path":     r.URL.Path,
+			"duration": time.Since(start),
+		}).Info("Completed request")
+	}
 }
