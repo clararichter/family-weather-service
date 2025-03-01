@@ -50,7 +50,7 @@ func (a *APIServer) handlerWeatherSummary(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	summary, err := a.weatherSummaryEngine.GenerateWeatherSummary(latitude, longitude)
+	summary, err := a.weatherSummaryService.GenerateWeatherSummary(latitude, longitude)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

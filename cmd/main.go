@@ -2,8 +2,11 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"weather-aggregation-service/internal/app"
+	httpclients "weather-aggregation-service/internal/http"
+	"weather-aggregation-service/internal/services"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -17,12 +20,16 @@ func main() {
 	}
 
 	port := os.Getenv("APP_PORT")
-	// apiKeyWeatherApi := os.Getenv("API_KEY_WEATHERAPI")
+	apiKey := os.Getenv("API_KEY_WEATHERAPI")
 
 	// create a global logger
 	logger := logrus.New()
 
-	api := app.NewAPIServer(logger, port)
+	httpClient := &http.Client{}
+	openMeteoCllient := httpclients.NewOpenMeteoClient(logger, httpClient, "https://api.open-meteo.com/v1/forecast")
+	weatherApiClient := httpclients.NewWeatherApiClient(logger, httpClient, "https://api.weatherapi.com/v1/forecast.json", apiKey)
+	weatherSummaryService := services.NewWeatherSummaryService(logger, openMeteoCllient, weatherApiClient)
+	api := app.NewAPIServer(logger, port, weatherSummaryService)
 
 	if err := api.Run(); err != nil {
 		logger.Fatal("Error starting the server:", err)

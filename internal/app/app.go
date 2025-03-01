@@ -10,23 +10,23 @@ import (
 )
 
 type APIServer struct {
-	logger               *logrus.Logger
-	port                 string
-	weatherSummaryEngine *services.WeatherSummaryService
+	logger                *logrus.Logger
+	port                  string
+	weatherSummaryService *services.WeatherSummaryService
 }
 
-// NewAPI initializes a new APIServer instance.
-func NewAPIServer(logger *logrus.Logger, port string) *APIServer {
+func NewAPIServer(logger *logrus.Logger, port string, weatherSummaryService *services.WeatherSummaryService) *APIServer {
 	return &APIServer{
-		logger: logger,
-		port:   port,
+		logger:                logger,
+		port:                  port,
+		weatherSummaryService: weatherSummaryService,
 	}
 }
 
-// Run starts the API server.
 func (a *APIServer) Run() error {
 	router := mux.NewRouter().StrictSlash(true)
 
+	// TODO if adding additional endpoints, we should probably refactor this a bit
 	router.
 		HandleFunc("/weather-summary", withLogging(a.logger, a.handlerWeatherSummary)).
 		Methods("GET").
@@ -39,12 +39,14 @@ func (a *APIServer) Run() error {
 	return http.ListenAndServe(a.port, router)
 }
 
+// TODO we should also log requests to endpoints that don't exists and which we simply reject
 func withLogging(logger *logrus.Logger, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
 		logger.WithFields(logrus.Fields{
 			"method": r.Method,
+			"query":  r.URL.RawQuery,
 			"path":   r.URL.Path,
 		}).Info("Endpoint hit")
 
@@ -52,6 +54,7 @@ func withLogging(logger *logrus.Logger, next http.HandlerFunc) http.HandlerFunc 
 
 		logger.WithFields(logrus.Fields{
 			"method":   r.Method,
+			"query":    r.URL.RawQuery,
 			"path":     r.URL.Path,
 			"duration": time.Since(start),
 		}).Info("Completed request")

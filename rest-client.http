@@ -32,6 +32,8 @@ GET {{BASE_DOMAIN}}
 User-Agent: rest-client
 Content-Type: application/json
 
+###
+
 # no location supplied
 GET {{BASE_URL}}
 User-Agent: rest-client
@@ -60,8 +62,8 @@ Content-Type: application/json
 
 ###
 
-# try injection
-GET {{BASE_URL}}?location=panic
+# try injection: panic("WELP")
+GET {{BASE_URL}}?location=panic%28%22WELP%22%29
 User-Agent: rest-client
 Content-Type: application/json
 
