@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Weather Summary Service for Families
+  description: |-
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /weather-summary:
+    get:
+      summary: Retrieve summarized forecast for today and tomorrow for a given location
+      description: Location needs to be provided as a latitude and longitude pair.
+      operationId: createWeatherSummary
+      parameters:
+        - name: location
+          in: query
+          description: Latitude and longitude for location. Needs to be on the form {lat},{long}.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherSummary'
+        '400':
+          description: Bad Request. Make sure location parameter is valid.
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    WeatherSummary:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: float
+          example: 10.51
+        longitude:
+          type: number
+          format: float
+          example: 13.88
+        timezone:
+          type: string
+          example: 'GMT+1'
+        units:
+          $ref: '#/components/schemas/Units'
+        today:
+          $ref: '#/components/schemas/DayForecast'
+        tomorrow:
+          $ref: '#/components/schemas/DayForecast'
+    DayForecast:
+      type: object
+      properties:
+        date:
+          type: string
+          example: '2025-03-01'
+        temperature_low:
+          type: number
+          format: float
+          example: 7.1
+        temperature_high:
+          type: number
+          format: float
+          example: 13.4
+        precipitation_total:
+          type: number
+          format: float
+          example: 10.5
+        wind_speed_high:
+          type: number
+          format: float
+          example: 3.0
+        wind_speed_low:
+          type: number
+          format: float
+          example: 0.1
+        uv_index_max:
+          type: number
+          format: float
+          example: 2.5
+    Units:
+      type: object
+      properties:
+        temperature:
+          type: string
+          example: '°C'
+        uv_index_max:
+          type: string
+          example: ''
+        precipitation:
+          type: string
+          example: 'mm'
+        wind_speed:
+          type: string
+          example: 'km/h'

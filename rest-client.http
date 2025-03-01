@@ -1,0 +1,68 @@
+# TODO port to environment variable
+@BASE_DOMAIN=http://localhost:3000
+@BASE_URL={{BASE_DOMAIN}}/weather-summary
+
+# happy cases
+
+# city, Berlin
+GET {{BASE_URL}}?location=52.5243,13.4105
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+
+# town, Saltsjobaden
+GET {{BASE_URL}}?location=59.2833,18.3
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+
+# municipality, Nacka
+GET {{BASE_URL}}?location=59.3105,18.1637
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+
+# exceptional input
+
+# invalid path
+GET {{BASE_DOMAIN}}
+User-Agent: rest-client
+Content-Type: application/json
+
+# no location supplied
+GET {{BASE_URL}}
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+
+# empty location
+GET {{BASE_URL}}?location=
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+
+# location does not exist
+GET {{BASE_URL}}?location=9999999,999999
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+
+# wrong format
+GET {{BASE_URL}}?location=59.2833
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+
+# try injection
+GET {{BASE_URL}}?location=panic
+User-Agent: rest-client
+Content-Type: application/json
+
+###
