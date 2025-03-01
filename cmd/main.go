@@ -2,12 +2,12 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 	"weather-aggregation-service/internal/app"
 	httpclients "weather-aggregation-service/internal/http"
 	"weather-aggregation-service/internal/services"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
@@ -25,7 +25,7 @@ func main() {
 	// create a global logger
 	logger := logrus.New()
 
-	httpClient := &http.Client{}
+	httpClient := resty.New()
 	openMeteoCllient := httpclients.NewOpenMeteoClient(logger, httpClient, "https://api.open-meteo.com/v1/forecast")
 	weatherApiClient := httpclients.NewWeatherApiClient(logger, httpClient, "https://api.weatherapi.com/v1/forecast.json", apiKey)
 	weatherSummaryService := services.NewWeatherSummaryService(logger, openMeteoCllient, weatherApiClient)
