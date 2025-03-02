@@ -28,8 +28,8 @@ e.g. as related to the number format of {lat,lon}. Example edge case: `12.,123.`
 
 - It would be useful to have an automated suite of end-to-end tests. As far as individual data points go, it's difficult to asses for correctness given we so heavily rely on third-parties for the determination of their values.
 
-- I didn't implement any unit tests for the lack of time. I usually like using more of a TDD approach but what
-happened, like it often does when there's a bit of time-crunch involved to finish functionality, I used a code-first approach, and didn't get to the point of writing tests.
+- I didn't implement any unit or integration tests for the lack of time. I usually like using more of a TDD approach but what
+happened, like it often does when there's a bit of time-crunch involved to finish functionality, is I used a code-first approach, and didn't get to the point of writing tests.
 
 - Aggregation of weather data from multiple sources is very rudimentary. The approach taken is to use single
 data points from two sources and let these complement each other. Where there are conflicts, we let the "most

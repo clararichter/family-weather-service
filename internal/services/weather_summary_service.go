@@ -27,6 +27,7 @@ func NewWeatherSummaryService(
 	}
 }
 
+// TODO create integration test for this function
 func (service *WeatherSummaryService) GenerateWeatherSummary(latitude float32, longitude float32) (*models.WeatherSummary, error) {
 	var (
 		forecastOpenMeteo  *http.OpenMeteoForecast
