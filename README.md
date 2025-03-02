@@ -66,7 +66,7 @@ $ go build -o main ./cmd
 
 To run the binary:
 ```
-$ go ./main
+$ ./main
 ```
 
 
@@ -82,7 +82,7 @@ $ docker build . -t family-weather-service
 The container reads `APP_PORT` from the .env file copied onto the image during runtime. 
 However, in order to have the service be accessible on your local system, you'll need to 
 supply a port mapping, where the container port must match the `APP_PORT` environment variable
-set in your .env file. A point of improvement is to fix this dependence.
+set in your .env file. A point of improvement is to fix the annoyance of having to supply the localhost port in two places.
 ```
 $ APP_PORT=8080           <---- must match APP_PORT in .env
 $ LOCALHOST_PORT=8080

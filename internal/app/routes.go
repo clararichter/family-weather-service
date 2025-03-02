@@ -47,8 +47,7 @@ func (a *APIServer) handlerWeatherSummary(w http.ResponseWriter, r *http.Request
 	latitude, longitude, err := extractLatLon(location)
 
 	if err != nil {
-		// TODO also send a message explaining that locations parameter is invalid
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid locations parameter"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -57,7 +56,8 @@ func (a *APIServer) handlerWeatherSummary(w http.ResponseWriter, r *http.Request
 		a.logger.WithFields(logrus.Fields{
 			"error": err,
 		}).Error("Unexpected error generating weather summary")
-		w.WriteHeader(http.StatusInternalServerError)
+
+		http.Error(w, `{"error": "Unexpected server error"}`, http.StatusInternalServerError)
 		return
 	}
 
