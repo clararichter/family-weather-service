@@ -7,6 +7,7 @@ import (
 	"weather-aggregation-service/internal/models"
 
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 )
 
 type WeatherSummaryService struct {
@@ -27,18 +28,31 @@ func NewWeatherSummaryService(
 }
 
 func (service *WeatherSummaryService) GenerateWeatherSummary(latitude float32, longitude float32) (*models.WeatherSummary, error) {
-	// TODO send requests concurrently
+	var (
+		forecastOpenMeteo  *http.OpenMeteoForecast
+		forecastWeatherApi *http.WeatherApiForecast
+	)
 
-	// TODO Reasonably, if both endpoints give rather comprehensive forecast data,
-	// we could still respond with useful information to the client, as long as at least one succeed
-	forecastOpenMeteo, err := service.openMeteoClient.RetrieveForecast(latitude, longitude)
-	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve forecast from Open Meteo")
+	var g errgroup.Group
+
+	// Fetch OpenMeteo and WeatherAPI forecasts concurrently
+	g.Go(func() error {
+		var err error
+		forecastOpenMeteo, err = service.openMeteoClient.RetrieveForecast(latitude, longitude)
+		return err
+	})
+
+	g.Go(func() error {
+		var err error
+		forecastWeatherApi, err = service.weatherApiClient.RetrieveForecast(latitude, longitude)
+		return err
+	})
+
+	// Wait for both goroutines to complete
+	if err := g.Wait(); err != nil {
+		return nil, err // Return error if any request fails
 	}
-	forecastWeatherApi, err := service.weatherApiClient.RetrieveForecast(latitude, longitude)
-	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve forecast from WeatherAPI")
-	}
+
 	return service.reconcileForecasts(forecastOpenMeteo, forecastWeatherApi)
 }
 

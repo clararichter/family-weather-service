@@ -33,8 +33,9 @@ happened, like it often does when there's a bit of time-crunch involved to finis
 
 - Aggregation of weather data from multiple sources is very rudimentary. The approach taken is to use single
 data points from two sources and let these complement each other. Where there are conflicts, we let the "most
-extreme" value take precedence, e.g., if there are two Daily max temperatures, we use the largest value.
-With more time I'd look into ways of incorpating hourly forecast data. There are cases where I'd like more rigourous handling of unexpected response data from the external weather APIs, such as when latitude/longitude is off or other reasons for questioning accuracy of data points.
+extreme" value take precedence, e.g., if there are two daily max temperatures, we use the largest value.
+With more time I'd look into ways of incorpating hourly forecast data. There are cases where I'd like more rigourous handling of unexpected response data from the external weather APIs, such as when latitude/longitude is off or other reasons for questioning accuracy of data points. 
+- One idea. Currently, we require both third-party service responses to succeed in order to continue with the aggregation, but we could possibly allow one to fail as long as we are able to retrieve enough comprehensive data. This would become more relevant if using more data sources.
 
 Some very basic security considerations...
 - The service is, on its own, obviously vulnerable to important attack vectors and faults since there is no rate-limiting. If this were to be spun up in production, we'd a layer in front of the service, such as reverse proxy, to guard against DOS attacks, but that's clearly out of scope for this project.
