@@ -120,14 +120,23 @@ func (client *WeatherApiClient) RetrieveForecast(latitude float32, longitude flo
 			"days": "2",
 			"key":  client.apiKey,
 		}).
+		SetHeader("Accept", "application/json").
 		SetResult(&result).
 		Get(client.url)
 
 	if err != nil {
+		client.logger.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Error sending request in WeatherApiClient.RetrieveForecast")
+
 		return nil, fmt.Errorf("error sending request: %w", err)
 	}
 
 	if resp.IsError() {
+		client.logger.WithFields(logrus.Fields{
+			"status code": resp.StatusCode(),
+		}).Error("Unexpected HTTP response in WeatherApiClient.RetrieveForecast")
+
 		return nil, fmt.Errorf("unexpected HTTP response: %s", resp.Status())
 	}
 

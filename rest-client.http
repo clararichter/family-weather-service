@@ -24,6 +24,31 @@ User-Agent: rest-client
 Content-Type: application/json
 
 ###
+# no decimals in latlon query param
+GET {{BASE_URL}}?location=59,18
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+# gazillion decimals
+GET {{BASE_URL}}?location=59.324234243242342,18.467458476869
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+# latitude,longitude out of range
+GET {{BASE_URL}}?location=593,183
+User-Agent: rest-client
+Content-Type: application/json
+
+###
+# trailing decimal point, but no following decimals
+# TODO this should be valid input, but currently fails validation
+GET {{BASE_URL}}?location=59.,18.
+User-Agent: rest-client
+Content-Type: application/json
+
+###
 
 # exceptional input
 

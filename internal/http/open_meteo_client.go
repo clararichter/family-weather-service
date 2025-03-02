@@ -2,7 +2,6 @@ package http
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/sirupsen/logrus"
@@ -75,21 +74,29 @@ func (client *OpenMeteoClient) RetrieveForecast(latitude float32, longitude floa
 
 	resp, err := client.httpClient.R().
 		SetQueryParams(map[string]string{
-			"latitude":      strconv.FormatFloat(float64(latitude), 'f', -1, 32),
-			"longitude":     strconv.FormatFloat(float64(longitude), 'f', -1, 32),
+			"latitude":      fmt.Sprint(latitude),
+			"longitude":     fmt.Sprint(longitude),
 			"hourly":        "temperature_2m,precipitation_probability,precipitation,wind_speed_10m,wind_direction_10m",
 			"daily":         "temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max",
 			"timezone":      "Europe/Berlin",
 			"forecast_days": "2",
 		}).
+		SetHeader("Accept", "application/json").
 		SetResult(&result).
 		Get(client.url)
 
 	if err != nil {
+		client.logger.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Error sending request in OpenMeteoClient.RetrieveForecast")
 		return nil, fmt.Errorf("error sending request: %w", err)
 	}
 
 	if resp.IsError() {
+		client.logger.WithFields(logrus.Fields{
+			"status code": resp.StatusCode(),
+		}).Error("Unexpected HTTP response in OpenMeteoClient.RetrieveForecast")
+
 		return nil, fmt.Errorf("unexpected HTTP response: %s", resp.Status())
 	}
 
