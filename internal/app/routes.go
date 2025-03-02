@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Example Matching strings
@@ -52,6 +54,9 @@ func (a *APIServer) handlerWeatherSummary(w http.ResponseWriter, r *http.Request
 
 	summary, err := a.weatherSummaryService.GenerateWeatherSummary(latitude, longitude)
 	if err != nil {
+		a.logger.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Unexpected error generating weather summary")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

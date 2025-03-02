@@ -42,6 +42,10 @@ func (service *WeatherSummaryService) GenerateWeatherSummary(latitude float32, l
 	return service.reconcileForecasts(forecastOpenMeteo, forecastWeatherApi)
 }
 
+// Use single data points from two sources and let these complement each other
+// Where there are conflicts, we let the "most extreme" value take precedence, e.g.,
+// if there are two daily max temperatures, we use the largest value
+// TODO create unit tests for function
 func (service *WeatherSummaryService) reconcileForecasts(omForecast *http.OpenMeteoForecast, waForecast *http.WeatherApiForecast) (*models.WeatherSummary, error) {
 	if err := validateForecastData_OpenMeteo(omForecast); err != nil {
 		return nil, err
@@ -80,6 +84,7 @@ func (service *WeatherSummaryService) reconcileForecasts(omForecast *http.OpenMe
 	}, nil
 }
 
+// TODO create unit tests for function
 func validateForecastData_OpenMeteo(forecast *http.OpenMeteoForecast) error {
 	if forecast == nil {
 		return fmt.Errorf("validateForecastData_OpenMeteo: unable to exract weather summary from nil object")
@@ -95,6 +100,7 @@ func validateForecastData_OpenMeteo(forecast *http.OpenMeteoForecast) error {
 	return nil
 }
 
+// TODO create unit tests for function
 func validateForecastData_WeatherApi(forecast *http.WeatherApiForecast) error {
 	if forecast == nil {
 		return fmt.Errorf("validateForecastData_WeatherApi: unable to exract weather summary from nil object")
