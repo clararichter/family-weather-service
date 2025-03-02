@@ -19,7 +19,15 @@ The response data for a weather summary is very limited given the problem descri
 There are many more data points of interest that could be included, such as air quality,
 hourly data, weather alerts, ...
 
-### Technical limitations and improvements
+### Weather forecast data aggregation
+Aggregation of weather data from multiple sources is very rudimentary. The approach taken is to use single
+data points from two sources and let these complement each other. Where there are conflicts, we let the "most
+extreme" value take precedence, e.g., if there are two daily max temperatures, we use the largest value.
+With more time I'd look into ways of incorpating hourly forecast data. There are cases where I'd like more rigourous handling of unexpected response data from the external weather APIs, such as when latitude/longitude is off or other reasons for questioning accuracy of data points. 
+
+One idea. Currently, we require both third-party service responses to succeed in order to continue with the aggregation, but we could possibly allow one to fail as long as we are able to retrieve enough comprehensive data. This would become more relevant if using more data sources.
+
+### Notes on testing
 - To test out the service, I relied on manual end-to-end tests, defining a number of test cases
 in `rest-client.http` and running them through the VS code integration `REST-client`.
 
@@ -31,17 +39,10 @@ e.g. as related to the number format of {lat,lon}. Example edge case: `12.,123.`
 - I didn't implement any unit or integration tests for the lack of time. I usually like using more of a TDD approach but what
 happened, like it often does when there's a bit of time-crunch involved to finish functionality, is I used a code-first approach, and didn't get to the point of writing tests.
 
-- Aggregation of weather data from multiple sources is very rudimentary. The approach taken is to use single
-data points from two sources and let these complement each other. Where there are conflicts, we let the "most
-extreme" value take precedence, e.g., if there are two daily max temperatures, we use the largest value.
-With more time I'd look into ways of incorpating hourly forecast data. There are cases where I'd like more rigourous handling of unexpected response data from the external weather APIs, such as when latitude/longitude is off or other reasons for questioning accuracy of data points. 
-- One idea. Currently, we require both third-party service responses to succeed in order to continue with the aggregation, but we could possibly allow one to fail as long as we are able to retrieve enough comprehensive data. This would become more relevant if using more data sources.
-
-Some very basic security considerations...
-- The service is, on its own, obviously vulnerable to important attack vectors and faults since there is no rate-limiting. If this were to be spun up in production, we'd a layer in front of the service, such as reverse proxy, to guard against DOS attacks, but that's clearly out of scope for this project.
+### Notes on security
+- The service is, on its own, vulnerable to important attack vectors and faults. If this were to be spun up in production, we'd a layer in front of the service, such as reverse proxy, to guard against DOS attacks and implement some form of rate-limiting, but that's clearly out of scope for this project.
 
 - The services communicates over http and not TLS/https.
-
 
 
 ### Dependencies used
@@ -50,3 +51,6 @@ was gorilla/mux made it slightly simpler)
 - sirpusen/logging - logging library that I'm accustomed to and like from before
 - godotenv - a convenience library for loading environment variables
 - resty - an http convenience library that makes sending http requests easier
+- sync - using sync/errgroup from the std lib in order to perform and synchronize 
+concurrent http request to third-party weather services. sync.errgroup is an augmented 
+form of sync.WaitGroup that makes error handling a bit simpler.
